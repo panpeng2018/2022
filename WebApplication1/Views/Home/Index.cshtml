@@ -1,0 +1,103 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<div class="text-center" id="vue">
+    <h1 class="display-4">Welcome</h1>
+
+
+    <label>MOCK多少条数据</label> <input type="text" id="addcount" v-model="addcount" />
+
+    @*    @Html.ActionLink("添加数据", "AddData", null, null,new { target= "_blank" })*@
+
+    <button v-on:click="add">增加数据</button>
+    <div class="container mt-3">
+        <h2>Leaderboard</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Customer ID</th>
+                    <th>Score</th>
+                    <th>Rank</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in datalist" :key="item.customerID">
+                    <td>{{ item.customerID }}</td>
+                    <td>{{ item.score }}</td>
+                    <td>{{ (index+1) }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+       <script type="text/javascript" src="~/jquery.min.js"></script>
+    <script type="text/javascript" src="~/signalr.min.js"></script>
+    <script>
+
+    $(function () {
+        //服务地址
+        let hubUrl = '/myhub';
+        let httpConnection = new signalR.HttpConnection(hubUrl);
+        let hubConnection = new signalR.HubConnection(httpConnection);
+
+        //服务器回调方法
+        hubConnection.on('Show', data => {
+            reload();
+        });
+        hubConnection.start();
+    });
+</script>
+<script>
+    function reload() {
+        console.log(123);
+        vm.loadData();
+    }
+</script>
+    <script>
+        var vm = new Vue({
+            el: "#vue",
+            data: {
+                addcount: "0",
+                datalist: {},
+            },
+            methods: {
+                loadData() {
+                    let url = "/api/custom";
+                    axios.get(url, {
+                    })
+                        .then(function(res) {
+                            console.log("返回结果1==>", res);
+                            vm.datalist = res.data;
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
+                add: function() {
+                    //let this = vm;
+                    if (this.addcount === "0") {
+                        alert("请输入需要添加多少条数据");
+                        return;
+                    }
+                    let url = "/api/custom/" + this.addcount;
+                    axios.get(url, {
+                    })
+                        .then(function(res) {
+                            vm.loadData();
+                            alert("添加成功,当前内存数据共有:" + res.data)
+                            console.log("返回结果==>", res);
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                },
+            },
+            mounted() {
+                this.loadData();
+            },
+        }); 
+
+    </script>
+  
