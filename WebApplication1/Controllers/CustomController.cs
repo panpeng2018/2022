@@ -27,14 +27,21 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                for (var i = 0; i < id; i++)
+                //for (var i = 0; i < id; i++)
+                //{
+                //    Customer ct = new Customer();
+                //    ct.CustomerID = list.Count + 1;
+                //    ct.Score = new Random().Next(1, 999999);
+                //    //ct.Score = 10;
+                //    list.Add(ct);
+                //}
+                Parallel.For(0, id, item =>
                 {
                     Customer ct = new Customer();
                     ct.CustomerID = list.Count + 1;
                     ct.Score = new Random().Next(1, 999999);
-                    //ct.Score = 10;
                     list.Add(ct);
-                }
+                });
                 return list.Count.ToString();
             }
             catch(Exception ex) 
