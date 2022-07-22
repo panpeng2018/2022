@@ -38,7 +38,7 @@ namespace WebApplication1.Controllers
         //        list.Add(ct);
         //    }
         //}
-        //public static List<Customer> GetListData()
+        //public static ConcurrentBag<Customer> GetListData()
         //{
         //    return list;
         //}

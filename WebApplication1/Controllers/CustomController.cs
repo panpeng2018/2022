@@ -3,6 +3,7 @@ using WebApplication1.Models;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.SignalR;
+using System.Collections.Concurrent;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebApplication1.Controllers
@@ -11,11 +12,13 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class CustomController : ControllerBase
     {
-        private static List<Customer> list = new List<Customer>();
+        private static ConcurrentBag<Customer> list = new ConcurrentBag<Customer>();
         [HttpGet]
         public List<Customer> Get()
         {
-            return list.OrderByDescending(a => a.Score).ThenBy(a=>a.CustomerID).ToList(); 
+            return list.OrderByDescending(a => a.Score).ThenBy(a=>a.CustomerID).ToList();
+
+
         }
 
         // GET api/<CustomController>/5
@@ -66,6 +69,13 @@ namespace WebApplication1.Controllers
                 {
                     model.Score = model.Score+score;
                 }
+                else
+                {
+                    Customer cmd = new Customer();
+                    cmd.CustomerID = customerid;
+                    cmd.Score = score;
+                    list.Add(cmd);
+                }
                 return true;
             }
             catch
@@ -73,9 +83,9 @@ namespace WebApplication1.Controllers
                 return false;
             }
         }
-        public static List<CustomerExt> GetList(int start, int end)
+        public static ConcurrentBag<CustomerExt> GetList(int start, int end)
         {
-            List<CustomerExt> newlist = new List<CustomerExt>();
+            ConcurrentBag<CustomerExt> newlist = new ConcurrentBag<CustomerExt>();
             try
             {
                 var lists = list.OrderByDescending(a => a.Score).ThenBy(a => a.CustomerID).ToList().GetRange(start-1, end-start+1);
@@ -96,9 +106,9 @@ namespace WebApplication1.Controllers
                 return newlist;
             }
         }
-        public static List<CustomerExt> GetList(int customerid,int start, int end)
+        public static ConcurrentBag<CustomerExt> GetList(int customerid,int start, int end)
         {
-            List<CustomerExt> newlist = new List<CustomerExt>();
+            ConcurrentBag<CustomerExt> newlist = new ConcurrentBag<CustomerExt>();
             try
             {
                 var listz = list.OrderByDescending(a => a.Score).ThenBy(a => a.CustomerID).ToList();
